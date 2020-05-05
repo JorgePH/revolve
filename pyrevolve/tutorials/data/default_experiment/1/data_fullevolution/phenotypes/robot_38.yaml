@@ -1,0 +1,130 @@
+id: robot_38
+body:
+  id: '1'
+  type: CoreComponent
+  orientation: 0
+  params:
+    blue: 0
+    green: 1
+    red: 1
+  children:
+    0:
+      id: '5'
+      type: ActiveHinge
+      orientation: 0
+      params:
+        blue: 0.58
+        green: 0.08
+        red: 1
+    1:
+      id: '2'
+      type: ActiveHinge
+      orientation: 90
+      params:
+        blue: 0
+        green: 0
+        red: 0.7
+      children:
+        1:
+          id: '4'
+          type: ActiveHinge
+          orientation: 270
+          params:
+            blue: 0.58
+            green: 0.08
+            red: 1
+    2:
+      id: 1s2
+      type: TouchSensor
+      orientation: 0
+      params:
+        blue: 0.7
+        green: 0.7
+        red: 0.7
+    3:
+      id: '3'
+      type: FixedBrick
+      orientation: 0
+      params:
+        blue: 1
+        green: 0
+        red: 0
+brain:
+  type: neural-network
+  neurons:
+    node1:
+      id: node1
+      layer: output
+      part_id: '2'
+      type: Oscillator
+    node2:
+      id: node2
+      layer: output
+      part_id: '4'
+      type: Oscillator
+    node3:
+      id: node3
+      layer: input
+      part_id: 1s2
+      type: Input
+    node4:
+      id: node4
+      layer: output
+      part_id: '5'
+      type: Oscillator
+    node-core1:
+      id: node-core1
+      layer: input
+      part_id: '1'
+      type: Input
+    node-core2:
+      id: node-core2
+      layer: input
+      part_id: '1'
+      type: Input
+    node-core3:
+      id: node-core3
+      layer: input
+      part_id: '1'
+      type: Input
+    node-core4:
+      id: node-core4
+      layer: input
+      part_id: '1'
+      type: Input
+    node-core5:
+      id: node-core5
+      layer: input
+      part_id: '1'
+      type: Input
+    node-core6:
+      id: node-core6
+      layer: input
+      part_id: '1'
+      type: Input
+  connections:
+  - dst: node1
+    src: node3
+    weight: 1
+  - dst: node2
+    src: node3
+    weight: -0.5233753196317925
+  - dst: node2
+    src: node2
+    weight: -0.5284825847489016
+  - dst: node4
+    src: node3
+    weight: -0.6466273790785582
+  params:
+    node1:
+      amplitude: 8.015903290631739
+      period: 7.97609420010004
+      phase_offset: 8.18491563979965
+    node2:
+      amplitude: 4.379051709680043
+      period: 3.331656846886682
+      phase_offset: 8.14947233365685
+    node4:
+      amplitude: 3.518345108261923
+      period: 7.43272956543509
+      phase_offset: 3.646434923296572

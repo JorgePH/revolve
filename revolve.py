@@ -25,7 +25,9 @@ def run(loop, arguments):
         # this split will give errors on windows
         manager_lib = os.path.splitext(arguments.manager)[0]
         manager_lib = '.'.join(manager_lib.split('/'))
-        manager = importlib.import_module(manager_lib).run
+        print(manager_lib)
+        #manager = importlib.import_module(manager_lib,'pyrevolve.tutorials').run
+        manager = importlib.import_module(manager_lib,'pyrevolve').run
         return loop.run_until_complete(manager())
     else:
         # no test robot, no manager -> just run gazebo
