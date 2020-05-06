@@ -2,10 +2,10 @@ import math
 import xml.etree.ElementTree
 
 from pyrevolve import SDF
-from pyrevolve.revolve_bot.revolve_module import ActiveHingeModule, Orientation, BoxSlot
+from pyrevolve.rmevo_bot.rmevo_module import ActiveHingeModule, Orientation, BoxSlot
 
 
-def revolve_bot_to_sdf(robot, robot_pose, nice_format, self_collide=True):
+def rmevo_bot_to_sdf(robot, robot_pose, nice_format, self_collide=True):
     from xml.etree import ElementTree
     from pyrevolve import SDF
 
@@ -126,7 +126,7 @@ def _module_to_sdf(module, parent_link, parent_slot: BoxSlot, parent_collision, 
     Recursive function that takes a module and returns a list of SDF links and joints that
     that module and his children have generated.
     :param module: Module to parse
-    :type module: RevolveModule
+    :type module: RMEvoModule
     :param parent_link: SDF `Link` of the parent
     :param parent_slot: Slot of the parent which this module should attach to
     :param parent_collision: Parent collision box, needed for the alignment.

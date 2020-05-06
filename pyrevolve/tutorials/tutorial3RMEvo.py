@@ -7,7 +7,7 @@ import os
 import sys
 import asyncio
 from pyrevolve.SDF.math import Vector3
-from pyrevolve import revolve_bot, parser
+from pyrevolve import rmevo_bot, parser
 from pyrevolve.tol.manage import World
 from pyrevolve.util.supervisor.supervisor_multi import DynamicSimSupervisor
 from pyrevolve.evolution import fitness
@@ -36,7 +36,7 @@ async def run():
         await asyncio.sleep(0.1)
 
     # Load a robot from yaml
-    robot = revolve_bot.RevolveBot()
+    robot = rmevo_bot.RMEvoBot()
     robot.load_file(robot_file_path)
     robot.update_substrate()
     # robot._brain = BrainRLPowerSplines()

@@ -7,7 +7,7 @@ from .inertial import Inertial
 from .joint import Joint
 from .sensor import CameraSensor, TouchSensor, IMUSensor
 from . import math
-from .revolve_bot_sdf_builder import revolve_bot_to_sdf
+from .rmevo_bot_sdf_builder import rmevo_bot_to_sdf
 
 
 def sub_element_text(parent, name, text):

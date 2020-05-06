@@ -157,7 +157,7 @@ class RMEvoBot:
     def to_sdf(self, pose=SDF.math.Vector3(0, 0, 0.25), nice_format=None):
         if type(nice_format) is bool:
             nice_format = '\t' if nice_format else None
-        return SDF.revolve_bot_to_sdf(self, pose, nice_format, self_collide=self.self_collide)
+        return SDF.rmevo_bot_to_sdf(self, pose, nice_format, self_collide=self.self_collide)
 
     def to_yaml(self):
         """
@@ -310,4 +310,4 @@ class RMEvoBot:
                 logger.exception('Failed rendering 2d robot')
 
     def __repr__(self):
-        return f'RevolveBot({self.id})'
+        return f'RMEvoBot({self.id})'

@@ -8,7 +8,7 @@ import time
 from pyrevolve import parser
 from pyrevolve.custom_logging import logger
 from pyrevolve.gazebo.analyze import BodyAnalyzer
-from pyrevolve.revolve_bot import RevolveBot
+from pyrevolve.rmevo_bot import RMEvoBot
 from pyrevolve.util.supervisor.supervisor_collision import CollisionSimSupervisor
 
 
@@ -24,7 +24,7 @@ async def test_collision_robot(robot_file_path: str):
     settings = parser.parse_args()
 
     assert (settings.test_robot_collision is not None)
-    robot = RevolveBot(_id=settings.test_robot_collision)
+    robot = RMEvoBot(_id=settings.test_robot_collision)
     robot.load_file(robot_file_path, conf_type='yaml')
     robot.save_file(f'{robot_file_path}.sdf', conf_type='sdf')
 

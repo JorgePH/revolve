@@ -5,7 +5,7 @@ import os
 
 from pyrevolve import parser
 from pyrevolve.custom_logging import logger
-from pyrevolve.revolve_bot import RevolveBot
+from pyrevolve.rmevo_bot import RMEvoBot
 from pyrevolve.SDF.math import Vector3
 from pyrevolve.tol.manage import World
 from pyrevolve.util.supervisor.supervisor_multi import DynamicSimSupervisor
