@@ -1,0 +1,9 @@
+---
+id: basic
+body:
+  id          : Body
+  type        : Body
+  params:
+    red: 0.04
+    green: 0.26
+    blue: 0.72

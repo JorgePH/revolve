@@ -8,7 +8,7 @@ from collections import deque
 
 from pyrevolve import SDF
 
-from .rmevo_module import CoreModule, TouchSensorModule, Orientation
+from .rmevo_module import RMEvoModule, CoreModule, TouchSensorModule, Orientation, FactoryModule
 from .rmevo_module import Orientation
 from .brain import Brain, BrainNN
 
@@ -25,7 +25,7 @@ class RMEvoBot:
     Generalization from the revolve robot used in the RMEvo code
     """
 
-    def __init__(self, _id=None, self_collide=True):
+    def __init__(self, _id=None, self_collide=True, self_factory=None):
         self._id = _id
         self._body = None
         self._brain = None
@@ -34,6 +34,8 @@ class RMEvoBot:
         self._behavioural_measurements = None
         self.self_collide = self_collide
         self.battery_level = 0.0
+        self.new_module = None
+        self.factory = self_factory
 
     @property
     def id(self):
@@ -125,9 +127,16 @@ class RMEvoBot:
         Load robot's description from a yaml string
         :param text: Robot's yaml description
         """
+
         yaml_bot = yaml.safe_load(text)
         self._id = yaml_bot['id'] if 'id' in yaml_bot else None
-        self._body = CoreModule.FromYaml(yaml_bot['body'])
+
+        #Try first to load a robot from the modules, else use the factory
+        try:
+            self._body = CoreModule.FromYaml(yaml_bot['body'])
+
+        except:
+            self._body = FactoryModule.FromYaml(yaml_bot['body'], self.factory)
 
         try:
             if 'brain' in yaml_bot:

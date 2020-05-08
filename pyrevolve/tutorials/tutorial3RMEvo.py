@@ -17,7 +17,8 @@ async def run():
     """
     The main coroutine, which is started below.
     """
-    robot_file_path = "experiments/examples/yaml/spider.yaml"
+    robot_file_path = "rmevo/test/basic.yaml"
+    module_file_path = 'rmevo/test/module.sdf'
 
     # Parse command line / file input arguments
     settings = parser.parse_args()
@@ -35,8 +36,12 @@ async def run():
         await simulator_supervisor.launch_simulator(port=settings.port_start)
         await asyncio.sleep(0.1)
 
+    # Load modules from files
+    factory = rmevo_bot.Factory()
+    factory.import_module_from_sdf(module_file_path)
+
     # Load a robot from yaml
-    robot = rmevo_bot.RMEvoBot()
+    robot = rmevo_bot.RMEvoBot(self_factory=factory)
     robot.load_file(robot_file_path)
     robot.update_substrate()
     # robot._brain = BrainRLPowerSplines()

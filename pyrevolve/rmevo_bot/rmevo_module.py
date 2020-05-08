@@ -6,6 +6,8 @@ from enum import Enum
 
 from pyrevolve import SDF
 
+import copy
+
 
 # MEASUREMENT CONVERSION
 def mm(x):
@@ -50,6 +52,7 @@ class RMEvoModule:
     COLLISION_BOX = None
     MASS = None
     INERTIA = None
+    SDF = None
 
     def __init__(self):
         self.id = None
@@ -58,6 +61,7 @@ class RMEvoModule:
         self.substrate_coordinates = None
         self.children = [None, None, None, None]
         self.info = None
+        self.robot = None
 
     def color(self):
         return self.rgb if self.rgb is not None else self.DEFAULT_COLOR
@@ -431,6 +435,73 @@ class TouchSensorModule(RMEvoModule):
 
         return visual, collision, sensor
 
+class FactoryModule(RMEvoModule):
+
+    """
+    Inherits class RMEvoModule. Use module available from Factory
+    """
+    TYPE = None
+    VISUAL_MESH = None
+    SLOT_COORDINATES = None
+    COLLISION_BOX = None
+    MASS = None
+    SDF = None
+
+    def __init__(self):
+        super().__init__()
+
+    def possible_slots(self):
+        return (
+            (-self.SLOT_COORDINATES, self.SLOT_COORDINATES),  # X
+            (-self.SLOT_COORDINATES, self.SLOT_COORDINATES),  # Y
+            (-self.SLOT_COORDINATES, self.SLOT_COORDINATES),  # Z
+        )
+
+    @staticmethod
+    def FromYaml(yaml_object, factory):
+        """
+        From a yaml object, creates a data struture of interconnected body modules.
+        Standard names for modules are:
+        CoreComponent
+        ActiveHinge
+        FixedBrick
+        FixedBrickSensor
+        """
+        
+        new_module = FactoryModule()
+
+        for module_template in factory.modules_list:
+            if module_template.TYPE == yaml_object['type']:
+                new_module = copy.deepcopy(module_template)
+
+        new_module.id = yaml_object['id']
+
+        try:
+            new_module.orientation = yaml_object['orientation']
+        except KeyError:
+            new_module.orientation = 0
+
+        try:
+            new_module.rgb = (
+                yaml_object['params']['red'],
+                yaml_object['params']['green'],
+                yaml_object['params']['blue'],
+            )
+        except KeyError:
+            pass
+
+        if 'children' in yaml_object:
+            for parent_slot in yaml_object['children']:
+                new_module.children[parent_slot] = FactoryModule.FromYaml(
+                    yaml_object=yaml_object['children'][parent_slot], factory=factory)
+
+        return new_module
+
+    def to_sdf(self, tree_depth='', parent_link=None, child_link=None):
+        imu_sensor = SDF.IMUSensor('core-imu_sensor', parent_link, self)
+        visual, collision, _ = super().to_sdf(tree_depth, parent_link, child_link)
+        parent_link.append(imu_sensor)
+        return visual, collision, imu_sensor
 
 class BoxSlot:
     """
