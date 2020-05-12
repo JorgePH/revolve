@@ -435,6 +435,7 @@ class TouchSensorModule(RMEvoModule):
 
         return visual, collision, sensor
 
+
 class FactoryModule(RMEvoModule):
 
     """
@@ -467,7 +468,7 @@ class FactoryModule(RMEvoModule):
         FixedBrick
         FixedBrickSensor
         """
-        
+
         new_module = FactoryModule()
 
         for module_template in factory.modules_list:

@@ -12,6 +12,8 @@ from pyrevolve.tol.manage import World
 from pyrevolve.util.supervisor.supervisor_multi import DynamicSimSupervisor
 from pyrevolve.evolution import fitness
 
+from pyrevolve.custom_logging.logger import logger
+
 
 async def run():
     """
@@ -19,6 +21,7 @@ async def run():
     """
     robot_file_path = "rmevo/test/basic.yaml"
     module_file_path = 'rmevo/test/module.sdf'
+    sdf_file_path = 'rmevo/test/robot.sdf'
 
     # Parse command line / file input arguments
     settings = parser.parse_args()
@@ -37,13 +40,23 @@ async def run():
         await asyncio.sleep(0.1)
 
     # Load modules from files
+    logger.info("Starting Factory.")
     factory = rmevo_bot.Factory()
+    logger.info("Importing module.")
     factory.import_module_from_sdf(module_file_path)
 
     # Load a robot from yaml
     robot = rmevo_bot.RMEvoBot(self_factory=factory)
+    logger.info("Loading Robot.")
     robot.load_file(robot_file_path)
     robot.update_substrate()
+
+    # Print robot to sdf file
+    logger.info("Parsing robot to model.")
+    sdf_model = robot.to_sdf()
+    robot_sdf_file = open(robot_file_path,'w')
+    robot_sdf_file.write(sdf_model)
+
     # robot._brain = BrainRLPowerSplines()
 
     # Connect to the simulator and pause
@@ -54,11 +67,11 @@ async def run():
     await connection.pause(False)
 
     # Insert the robot in the simulator
-    robot_manager = await connection.insert_robot(robot, Vector3(0, 0, settings.z_start))
+    # robot_manager = await connection.insert_robot(robot, Vector3(0, 0, settings.z_start))
 
     # Start a run loop to do some stuff
     while True:
         # Print robot fitness every second
-        status = 'dead' if robot_manager.dead else 'alive'
-        print(f"Robot fitness ({status}) is: {fitness.displacement(robot_manager, robot)} \n")
+        #status = 'dead' if robot_manager.dead else 'alive'
+        #print(f"Robot fitness ({status}) is: {fitness.displacement(robot_manager, robot)} \n")
         await asyncio.sleep(1.0)

@@ -136,6 +136,7 @@ class RMEvoBot:
             self._body = CoreModule.FromYaml(yaml_bot['body'])
 
         except:
+            logger.info('No basic module found, loading from Factory')
             self._body = FactoryModule.FromYaml(yaml_bot['body'], self.factory)
 
         try:

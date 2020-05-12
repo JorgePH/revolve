@@ -2,6 +2,8 @@ from xml.etree.ElementTree import ElementTree
 from .rmevo_module import RMEvoModule
 from enum import Enum
 
+from pyrevolve.custom_logging.logger import logger
+
 
 class Box:
     size = [1, 1, 1]
@@ -54,12 +56,12 @@ class Factory:
                 self.parse_visual(module, child)
 
     def parse_model(self, module, model_tree):
-        module.TYPE = model_tree.attrib
+        module.TYPE = model_tree.attrib['name']
         for child in model_tree:
             if child.tag == 'link':
                 self.parse_link(module, child)
             else:
-                print('Input file has wrong structure: error in link')
+                logger.error("Input file has wrong structure: error in link")
 
     def import_module_from_sdf(self, file):
         """
@@ -71,14 +73,16 @@ class Factory:
         sdf_tree.parse(file)
         root = sdf_tree.getroot()
 
+        logger.info("Importing file.")
+
         if not root.tag == 'sdf':
-            print('Input file is not a valid sdf')
+            logger.error("Input file is not a valid sdf")
         else:
             version = root.attrib
             for child in root:
                 if child.tag == 'model':
                     self.parse_model(new_module, child)
                 else:
-                    print('Input file has wrong structure: error in model')
+                    logger.error("Input file has wrong structure: error in model")
 
         self.modules_list.append(new_module)
