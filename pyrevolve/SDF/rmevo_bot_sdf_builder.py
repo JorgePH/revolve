@@ -20,7 +20,7 @@ def rmevo_bot_to_sdf(robot, robot_pose, nice_format, self_collide=True):
     model.append(pose_elem)
 
     core_link = SDF.Link('Core', self_collide=self_collide)
-    core_visual, core_collision, imu_core_sensor = robot._body.to_sdf('', core_link)
+    core_visual, core_collision, imu_core_sensor = robot.body.to_sdf('', core_link)
 
     links = [core_link]
     joints = []
@@ -63,8 +63,8 @@ def rmevo_bot_to_sdf(robot, robot_pose, nice_format, self_collide=True):
         model.append(link)
 
     # ADD BRAIN
-    plugin_elem = _sdf_brain_plugin_conf(robot._brain, sensors, actuators, robot_genome=None)
-    model.append(plugin_elem)
+    #plugin_elem = _sdf_brain_plugin_conf(robot.brain, sensors, actuators, robot_genome=None)
+    #model.append(plugin_elem)
 
     # XML RENDER PHASE #
     def prettify(rough_string, indent='\t'):

@@ -447,6 +447,9 @@ class FactoryModule(RMEvoModule):
     COLLISION_BOX = None
     MASS = None
     SDF = None
+    SDF_VISUAL = None
+    SDF_COLLISION = None
+    SDF_INERTIA = None
 
     def __init__(self):
         super().__init__()
@@ -499,10 +502,20 @@ class FactoryModule(RMEvoModule):
         return new_module
 
     def to_sdf(self, tree_depth='', parent_link=None, child_link=None):
-        imu_sensor = SDF.IMUSensor('core-imu_sensor', parent_link, self)
-        visual, collision, _ = super().to_sdf(tree_depth, parent_link, child_link)
-        parent_link.append(imu_sensor)
-        return visual, collision, imu_sensor
+        from ..SDF.geometry import Material
+
+        visual = self.SDF_VISUAL
+        material = Material(
+            ambient=(self.rgb[0], self.rgb[1], self.rgb[2], 1.0),
+            diffuse=(self.rgb[0], self.rgb[1], self.rgb[2], 1.0),
+            specular=(0.1, 0.1, 0.1, 1.0),
+        )
+        visual.append(material)
+
+        collision = self.SDF_COLLISION
+
+        return visual, collision, None
+
 
 class BoxSlot:
     """

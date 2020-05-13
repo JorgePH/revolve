@@ -1,5 +1,5 @@
 from xml.etree.ElementTree import ElementTree
-from .rmevo_module import RMEvoModule
+from .rmevo_module import FactoryModule
 from enum import Enum
 
 from pyrevolve.custom_logging.logger import logger
@@ -35,15 +35,13 @@ class Factory:
         self.modules_list = []
 
     def parse_inertia(self, module, inertia_tree):
-        None
+        module.SDF_INERTIA = inertia_tree
 
-    def parse_collision(self, module, inertia_tree):
-        None
+    def parse_collision(self, module, collision_tree):
+        module.SDF_COLLISION = collision_tree
 
     def parse_visual(self, module, visual_tree):
-        None
-        #for child in visual_tree:
-        #    if child.tag == 'geometry':
+        module.SDF_VISUAL = visual_tree
 
     def parse_link(self, module, link_tree):
         module.SDF = link_tree
@@ -68,7 +66,7 @@ class Factory:
         Import module from SDF
         """
 
-        new_module = RMEvoModule()
+        new_module = FactoryModule()
         sdf_tree = ElementTree()
         sdf_tree.parse(file)
         root = sdf_tree.getroot()

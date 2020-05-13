@@ -20,6 +20,7 @@ async def run():
     The main coroutine, which is started below.
     """
     robot_file_path = "rmevo/test/basic.yaml"
+    #robot_file_path = "experiments/examples/yaml/spider.yaml"
     module_file_path = 'rmevo/test/module.sdf'
     sdf_file_path = 'rmevo/test/robot.sdf'
 
@@ -54,8 +55,9 @@ async def run():
     # Print robot to sdf file
     logger.info("Parsing robot to model.")
     sdf_model = robot.to_sdf()
-    robot_sdf_file = open(robot_file_path,'w')
+    robot_sdf_file = open(sdf_file_path, 'w')
     robot_sdf_file.write(sdf_model)
+    robot_sdf_file.close()
 
     # robot._brain = BrainRLPowerSplines()
 
