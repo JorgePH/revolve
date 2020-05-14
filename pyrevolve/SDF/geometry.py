@@ -54,6 +54,16 @@ class Visual(SDF.Posable):
         )
         self.append(material)
 
+    def __deepcopy__(self, memodict={}):
+        import copy
+        newone = type(self)('')
+        newone.attrib = copy.deepcopy(self.attrib)
+        newone.tag = copy.deepcopy(self.tag)
+        newone.tail = copy.deepcopy(self.tail)
+        newone.text = copy.deepcopy(self.text)
+        newone.set_position(self.get_position())
+        return newone
+
 
 class SurfaceProperties(xml.etree.ElementTree.Element):
     def __init__(self):
@@ -128,3 +138,9 @@ class Collision(SDF.Posable):
 
     def get_center_of_mass(self):
         return self.get_position()
+
+    def __deepcopy__(self, memodict={}):
+        newone = type(self)('', 0.0)
+        newone.__dict__.update(self.__dict__)
+        #newone.
+        return newone
