@@ -59,7 +59,7 @@ def rmevo_bot_to_sdf(robot, robot_pose, nice_format, self_collide=True):
 
     for link in links:
         link.align_center_of_mass()
-        link.calculate_inertial()
+        #link.calculate_inertial()
         model.append(link)
 
     # ADD BRAIN

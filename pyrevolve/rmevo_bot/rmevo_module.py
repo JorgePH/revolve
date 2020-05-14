@@ -443,7 +443,9 @@ class FactoryModule(RMEvoModule):
     """
     TYPE = None
     VISUAL_MESH = None
-    SLOT_COORDINATES = None
+    SLOT_COORDINATES = [[0, 0],
+                        [0, 0],
+                        [0, 0]]
     COLLISION_BOX = None
     MASS = None
     SDF = None
@@ -455,11 +457,7 @@ class FactoryModule(RMEvoModule):
         super().__init__()
 
     def possible_slots(self):
-        return (
-            (-self.SLOT_COORDINATES, self.SLOT_COORDINATES),  # X
-            (-self.SLOT_COORDINATES, self.SLOT_COORDINATES),  # Y
-            (-self.SLOT_COORDINATES, self.SLOT_COORDINATES),  # Z
-        )
+        return self.SLOT_COORDINATES
 
     @staticmethod
     def FromYaml(yaml_object, factory):

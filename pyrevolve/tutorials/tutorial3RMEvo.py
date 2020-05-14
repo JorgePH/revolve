@@ -19,7 +19,8 @@ async def run():
     """
     The main coroutine, which is started below.
     """
-    robot_file_path = "rmevo/test/basic.yaml"
+    #robot_file_path = "rmevo/test/basic.yaml"
+    robot_file_path = "rmevo/test/twomodules.yaml"
     #robot_file_path = "experiments/examples/yaml/spider.yaml"
     module_file_path = 'rmevo/test/module.sdf'
     sdf_file_path = 'rmevo/test/robot.sdf'

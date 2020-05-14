@@ -2,7 +2,11 @@ from xml.etree.ElementTree import ElementTree
 from .rmevo_module import FactoryModule
 from enum import Enum
 
+import copy
+
 from pyrevolve.custom_logging.logger import logger
+
+from ..SDF.geometry import Visual, Collision
 
 
 class Box:
@@ -34,14 +38,25 @@ class Factory:
     def __init__(self):
         self.modules_list = []
 
+    def parse_sdf_attribute(self, tree, attribute):
+        value = tree.get(attribute)
+
+        if value is not None:
+            value = value.split()
+            value = [float(i) for i in value]
+
+        return value
+
     def parse_inertia(self, module, inertia_tree):
         module.SDF_INERTIA = inertia_tree
 
     def parse_collision(self, module, collision_tree):
-        module.SDF_COLLISION = collision_tree
+        module.SDF_COLLISION = Collision(collision_tree.get('name'), 0.0)
+        module.SDF_COLLISION = copy.deepcopy(collision_tree)
 
     def parse_visual(self, module, visual_tree):
-        module.SDF_VISUAL = visual_tree
+        module.SDF_VISUAL = Visual(visual_tree.get('name'))
+        module.SDF_VISUAL = copy.deepcopy(visual_tree)
 
     def parse_link(self, module, link_tree):
         module.SDF = link_tree
@@ -53,11 +68,20 @@ class Factory:
             elif child.tag == 'visual':
                 self.parse_visual(module, child)
 
+    def parse_rmevo(self, module, rmevo_tree):
+        for child in rmevo_tree:
+            if child.tag == 'slots':
+                module.SLOT_COORDINATES[0] = self.parse_sdf_attribute(child, 'x')
+                module.SLOT_COORDINATES[1] = self.parse_sdf_attribute(child, 'y')
+                module.SLOT_COORDINATES[2] = self.parse_sdf_attribute(child, 'z')
+
     def parse_model(self, module, model_tree):
         module.TYPE = model_tree.attrib['name']
         for child in model_tree:
             if child.tag == 'link':
                 self.parse_link(module, child)
+            elif child.tag == 'rmevo':
+                self.parse_rmevo(module, child)
             else:
                 logger.error("Input file has wrong structure: error in link")
 
