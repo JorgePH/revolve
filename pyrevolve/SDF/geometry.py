@@ -1,4 +1,6 @@
 import xml.etree.ElementTree
+import copy
+
 from pyrevolve import SDF
 
 
@@ -55,15 +57,17 @@ class Visual(SDF.Posable):
         self.append(material)
 
     def __deepcopy__(self, memodict={}):
-        import copy
-        newone = type(self)('')
+        newone = Visual('')
         newone.attrib = copy.deepcopy(self.attrib)
         newone.tag = copy.deepcopy(self.tag)
         newone.tail = copy.deepcopy(self.tail)
         newone.text = copy.deepcopy(self.text)
-        newone.set_position(self.get_position())
-        return newone
+        newone.set_position(position=self.get_position())
 
+        for item in list(self):
+            newone.append(item)
+
+        return newone
 
 class SurfaceProperties(xml.etree.ElementTree.Element):
     def __init__(self):
@@ -139,8 +143,22 @@ class Collision(SDF.Posable):
     def get_center_of_mass(self):
         return self.get_position()
 
+    def set_tree(self, tree):
+        self.__dict__.update(tree)
+
+    @classmethod
+    def from_tree(cls, tree):
+        super(Collision, self).fro
+
     def __deepcopy__(self, memodict={}):
-        newone = type(self)('', 0.0)
-        newone.__dict__.update(self.__dict__)
-        #newone.
+        newone = Collision('', 0.0)
+        newone.attrib = copy.deepcopy(self.attrib)
+        newone.tag = copy.deepcopy(self.tag)
+        newone.tail = copy.deepcopy(self.tail)
+        newone.text = copy.deepcopy(self.text)
+        newone.set_position(position=self.get_position())
+
+        for item in list(self):
+            newone.append(item)
+
         return newone

@@ -252,3 +252,12 @@ class Posable(xml.etree.ElementTree.Element):
         at_pos = of.to_parent_frame(at.pos)
         translation = at_pos - my_pos
         self.translate(translation)
+
+    def copy_from_tree(self, tree):
+        self.attrib = tree.attrib
+        self.tag = tree.tag
+        self.tail = tree.tail
+        self.text = tree.text
+
+        for item in list(tree):
+            self.append(item)

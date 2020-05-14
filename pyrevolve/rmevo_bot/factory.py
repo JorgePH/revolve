@@ -52,11 +52,12 @@ class Factory:
 
     def parse_collision(self, module, collision_tree):
         module.SDF_COLLISION = Collision(collision_tree.get('name'), 0.0)
-        module.SDF_COLLISION = copy.deepcopy(collision_tree)
+        module.SDF_COLLISION.copy_from_tree(collision_tree)
+
 
     def parse_visual(self, module, visual_tree):
         module.SDF_VISUAL = Visual(visual_tree.get('name'))
-        module.SDF_VISUAL = copy.deepcopy(visual_tree)
+        module.SDF_VISUAL.copy_from_tree(visual_tree)
 
     def parse_link(self, module, link_tree):
         module.SDF = link_tree
