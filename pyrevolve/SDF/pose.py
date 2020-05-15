@@ -259,5 +259,8 @@ class Posable(xml.etree.ElementTree.Element):
         self.tail = tree.tail
         self.text = tree.text
 
+        for item in list(self):
+            self.remove(item)
+
         for item in list(tree):
             self.append(item)

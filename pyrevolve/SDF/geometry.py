@@ -67,6 +67,9 @@ class Visual(SDF.Posable):
         for item in list(self):
             newone.append(item)
 
+        for item in list(newone):
+            newone.remove(item)
+
         return newone
 
 class SurfaceProperties(xml.etree.ElementTree.Element):
@@ -157,6 +160,9 @@ class Collision(SDF.Posable):
         newone.tail = copy.deepcopy(self.tail)
         newone.text = copy.deepcopy(self.text)
         newone.set_position(position=self.get_position())
+
+        for item in list(newone):
+            newone.remove(item)
 
         for item in list(self):
             newone.append(item)
