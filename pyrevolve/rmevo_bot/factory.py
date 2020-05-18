@@ -49,6 +49,8 @@ class Factory:
 
     def parse_inertia(self, module, inertia_tree):
         module.SDF_INERTIA = inertia_tree
+        module.MASS = float(inertia_tree.find('mass').text)
+        module.SDF_COLLISION.mass = module.MASS
 
     def parse_collision(self, module, collision_tree):
         module.SDF_COLLISION = Collision(collision_tree.get('name'), 0.0)
@@ -61,13 +63,21 @@ class Factory:
 
     def parse_link(self, module, link_tree):
         module.SDF = link_tree
-        for child in link_tree:
-            if child.tag == 'inertial':
-                self.parse_inertia(module, child)
-            elif child.tag == 'collision':
-                self.parse_collision(module, child)
-            elif child.tag == 'visual':
-                self.parse_visual(module, child)
+
+        if link_tree.find('collision') is not None:
+            self.parse_collision(module, link_tree.find('collision'))
+        else:
+            raise RuntimeError('Collision tag not found in link')
+
+        if link_tree.find('inertial') is not None:
+            self.parse_inertia(module, link_tree.find('inertial'))
+        else:
+            raise RuntimeError('Inertial tag not found in link')
+
+        if link_tree.find('visual') is not None:
+            self.parse_visual(module, link_tree.find('visual'))
+        else:
+            raise RuntimeError('Visual tag not found in link')
 
     def parse_rmevo(self, module, rmevo_tree):
         for child in rmevo_tree:
@@ -109,3 +119,4 @@ class Factory:
                     logger.error("Input file has wrong structure: error in model")
 
         self.modules_list.append(new_module)
+

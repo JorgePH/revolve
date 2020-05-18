@@ -64,13 +64,14 @@ class Visual(SDF.Posable):
         newone.text = copy.deepcopy(self.text)
         newone.set_position(position=self.get_position())
 
-        for item in list(self):
-            newone.append(item)
-
         for item in list(newone):
             newone.remove(item)
 
+        for item in list(self):
+            newone.append(item)
+
         return newone
+
 
 class SurfaceProperties(xml.etree.ElementTree.Element):
     def __init__(self):
@@ -160,6 +161,8 @@ class Collision(SDF.Posable):
         newone.tail = copy.deepcopy(self.tail)
         newone.text = copy.deepcopy(self.text)
         newone.set_position(position=self.get_position())
+        newone.mass = copy.deepcopy(self.mass)
+        newone.name = copy.deepcopy(self.name)
 
         for item in list(newone):
             newone.remove(item)

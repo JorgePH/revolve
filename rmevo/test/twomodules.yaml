@@ -1,0 +1,27 @@
+---
+id: basic
+body:
+  id          : Body
+  type        : Body
+  params:
+    red: 0.04
+    green: 0.26
+    blue: 0.72
+  children    :
+    0:
+      id          : Body
+      type        : Body
+      params:
+        red: 0.98
+        green: 0.98
+        blue: 0.98
+      orientation : 90
+    1:
+      id          : Body
+      type        : Body
+      params:
+        red: 0.98
+        green: 0.98
+        blue: 0.98
+      orientation : 90
+

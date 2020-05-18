@@ -8,7 +8,6 @@ from pyrevolve import SDF
 
 import copy
 
-
 # MEASUREMENT CONVERSION
 def mm(x):
     return x / 1000.0
@@ -67,7 +66,7 @@ class RMEvoModule:
         return self.rgb if self.rgb is not None else self.DEFAULT_COLOR
 
     @staticmethod
-    def FromYaml(yaml_object):
+    def FromYaml(yaml_object, factory=None):
         """
         From a yaml object, creates a data struture of interconnected body modules. 
         Standard names for modules are: 
@@ -108,8 +107,8 @@ class RMEvoModule:
 
         if 'children' in yaml_object:
             for parent_slot in yaml_object['children']:
-                module.children[parent_slot] = RMEvoModule.FromYaml(
-                    yaml_object=yaml_object['children'][parent_slot])
+                module.children[parent_slot] = FactoryModule.FromYaml(
+                    yaml_object=yaml_object['children'][parent_slot], factory=factory)
 
         return module
 
@@ -470,34 +469,44 @@ class FactoryModule(RMEvoModule):
         FixedBrickSensor
         """
 
-        new_module = FactoryModule()
-
-        for module_template in factory.modules_list:
-            if module_template.TYPE == yaml_object['type']:
-                new_module = copy.deepcopy(module_template)
-
-        new_module.id = yaml_object['id']
-
         try:
-            new_module.orientation = yaml_object['orientation']
-        except KeyError:
-            new_module.orientation = 0
+            return RMEvoModule.FromYaml(yaml_object, factory)
 
-        try:
-            new_module.rgb = (
-                yaml_object['params']['red'],
-                yaml_object['params']['green'],
-                yaml_object['params']['blue'],
-            )
-        except KeyError:
-            pass
+        except NotImplementedError:
 
-        if 'children' in yaml_object:
-            for parent_slot in yaml_object['children']:
-                new_module.children[parent_slot] = FactoryModule.FromYaml(
-                    yaml_object=yaml_object['children'][parent_slot], factory=factory)
+            new_module = FactoryModule()
 
-        return new_module
+            for module_template in factory.modules_list:
+                if module_template.TYPE == yaml_object['type']:
+                    new_module = copy.deepcopy(module_template)
+
+            new_module.id = yaml_object['id']
+
+            try:
+                new_module.orientation = yaml_object['orientation']
+            except KeyError:
+                new_module.orientation = 0
+
+            try:
+                new_module.rgb = (
+                    yaml_object['params']['red'],
+                    yaml_object['params']['green'],
+                    yaml_object['params']['blue'],
+                )
+            except KeyError:
+                pass
+
+            if 'children' in yaml_object:
+                for parent_slot in yaml_object['children']:
+                    # Try first to load a robot from the modules, else use the factory
+                    try:
+                        new_module.children[parent_slot] = super().FromYaml(yaml_object['children'][parent_slot])
+
+                    except TypeError:
+                        new_module.children[parent_slot] = FactoryModule.FromYaml(
+                            yaml_object=yaml_object['children'][parent_slot], factory=factory)
+
+            return new_module
 
     def to_sdf(self, tree_depth='', parent_link=None, child_link=None):
         from ..SDF.geometry import Material

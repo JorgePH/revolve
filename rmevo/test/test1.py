@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-This script loads a robot.yaml file and inserts it into the simulator.
+This script is used for testing the SDF parser. It is used to import modules from sdf files and use them to assemble robots.
+It outputs the final robot to a SDF file.
 """
 
 import os
@@ -16,6 +17,7 @@ from pyrevolve.custom_logging.logger import logger
 
 factory = rmevo_bot.Factory()
 
+
 async def run():
     """
     The main coroutine, which is started below.
@@ -29,19 +31,6 @@ async def run():
 
     # Parse command line / file input arguments
     settings = parser.parse_args()
-
-    # Start Simulator
-    if settings.simulator_cmd != 'debug':
-        simulator_supervisor = DynamicSimSupervisor(
-            world_file=settings.world,
-            simulator_cmd=settings.simulator_cmd,
-            simulator_args=["--verbose"],
-            plugins_dir_path=os.path.join('.', 'build', 'lib'),
-            models_dir_path=os.path.join('.', 'models'),
-            simulator_name='gazebo'
-        )
-        # await simulator_supervisor.launch_simulator(port=settings.port_start)
-        await asyncio.sleep(0.1)
 
     # Load modules from files
     logger.info("Starting Factory.")
@@ -60,22 +49,3 @@ async def run():
     robot_sdf_file = open(sdf_file_path, 'w')
     robot_sdf_file.write(sdf_model)
     robot_sdf_file.close()
-
-    # robot._brain = BrainRLPowerSplines()
-
-    # Connect to the simulator and pause
-    #connection = await World.create(settings, world_address=('127.0.0.1', settings.port_start))
-    await asyncio.sleep(1)
-
-    # Starts the simulation
-    #await connection.pause(False)
-
-    # Insert the robot in the simulator
-    # robot_manager = await connection.insert_robot(robot, Vector3(0, 0, settings.z_start))
-
-    # Start a run loop to do some stuff
-    while True:
-        # Print robot fitness every second
-        #status = 'dead' if robot_manager.dead else 'alive'
-        #print(f"Robot fitness ({status}) is: {fitness.displacement(robot_manager, robot)} \n")
-        await asyncio.sleep(1.0)

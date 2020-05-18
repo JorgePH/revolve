@@ -131,13 +131,7 @@ class RMEvoBot:
         yaml_bot = yaml.safe_load(text)
         self._id = yaml_bot['id'] if 'id' in yaml_bot else None
 
-        #Try first to load a robot from the modules, else use the factory
-        try:
-            self._body = CoreModule.FromYaml(yaml_bot['body'])
-
-        except:
-            logger.info('No basic module found, loading from Factory')
-            self._body = FactoryModule.FromYaml(yaml_bot['body'], self.factory)
+        self._body = FactoryModule.FromYaml(yaml_bot['body'], self.factory)
 
         try:
             if 'brain' in yaml_bot:
