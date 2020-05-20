@@ -499,10 +499,10 @@ class FactoryModule(RMEvoModule):
             if 'children' in yaml_object:
                 for parent_slot in yaml_object['children']:
                     # Try first to load a robot from the modules, else use the factory
-                    try:
-                        new_module.children[parent_slot] = super().FromYaml(yaml_object['children'][parent_slot])
-
-                    except TypeError:
+                    # try:
+                    #     new_module.children[parent_slot] = super().FromYaml(yaml_object['children'][parent_slot])
+                    #
+                    # except TypeError:
                         new_module.children[parent_slot] = FactoryModule.FromYaml(
                             yaml_object=yaml_object['children'][parent_slot], factory=factory)
 
@@ -521,7 +521,13 @@ class FactoryModule(RMEvoModule):
 
         collision = self.SDF_COLLISION
 
-        return visual, collision, None
+        if self.id == 'Core':
+            imu_sensor = SDF.IMUSensor('core-imu_sensor', parent_link, self)
+            parent_link.append(imu_sensor)
+        else:
+            imu_sensor = None
+
+        return visual, collision, imu_sensor
 
 
 class BoxSlot:

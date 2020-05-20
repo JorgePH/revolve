@@ -63,8 +63,8 @@ def rmevo_bot_to_sdf(robot, robot_pose, nice_format, self_collide=True):
         model.append(link)
 
     # ADD BRAIN
-    #plugin_elem = _sdf_brain_plugin_conf(robot.brain, sensors, actuators, robot_genome=None)
-    #model.append(plugin_elem)
+    plugin_elem = _sdf_brain_plugin_conf(robot.brain, sensors, actuators, robot_genome=None)
+    model.append(plugin_elem)
 
     # XML RENDER PHASE #
     def prettify(rough_string, indent='\t'):
