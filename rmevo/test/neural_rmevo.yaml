@@ -9,39 +9,13 @@ body:
     blue: 0.05
   children    :
     0:
-      id          : Leg00Joint
-      type        : ActiveHinge
+      id          : Leg00
+      type        : Leg
       params:
         red: 0.98
         green: 0.98
         blue: 0.98
       orientation : 90
-      children    :
-        1:
-          id          : Leg00
-          type        : Body
-          params:
-            red: 0.94
-            green: 0.98
-            blue: 0.05
-          orientation : -90
-    1:
-      id          : Leg01Joint
-      type        : ActiveHinge
-      params:
-        red: 0.98
-        green: 0.98
-        blue: 0.98
-      orientation : 90
-      children    :
-        1:
-          id          : Leg00
-          type        : Body
-          params:
-            red: 0.94
-            green: 0.98
-            blue: 0.05
-          orientation : -90
 
 brain:
   type: rlpower-splines

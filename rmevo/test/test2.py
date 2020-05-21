@@ -15,15 +15,16 @@ from pyrevolve.evolution import fitness
 
 from pyrevolve.custom_logging.logger import logger
 
-factory = rmevo_bot.Factory()
-
 async def run():
     """
     The main coroutine, which is started below.
     """
-    robot_file_path = "rmevo/test/neural_revolve.yaml"
+    robot_file_path = "rmevo/test/neural_rmevo.yaml"
     #robot_file_path = "rmevo/test/snake.yaml"
+
     module_file_path = 'rmevo/test/module.sdf'
+    module_file_dir = 'rmevo/test/modules'
+
     sdf_file_path = 'rmevo/test/robot.sdf'
 
     # Parse command line / file input arguments
@@ -44,8 +45,9 @@ async def run():
 
     # Load modules from files
     logger.info("Starting Factory.")
+    factory = rmevo_bot.Factory()
     logger.info("Importing module.")
-    factory.import_module_from_sdf(module_file_path)
+    factory.import_modules_from_dir(module_file_dir)
 
     # Load a robot from yaml
     robot = rmevo_bot.RMEvoBot(self_factory=factory)

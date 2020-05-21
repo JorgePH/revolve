@@ -120,3 +120,13 @@ class Factory:
 
         self.modules_list.append(new_module)
 
+    def import_modules_from_dir(self, dir_path):
+        import os
+        import fnmatch
+        # List all files the given directory and select the .sdf
+        for entry in os.listdir(dir_path):
+            file_path = os.path.join(dir_path, entry)
+            if os.path.isfile(file_path):
+                if fnmatch.fnmatch(file_path, '*.sdf'):
+                    self.import_module_from_sdf(file_path)
+
