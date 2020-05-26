@@ -1,0 +1,266 @@
+﻿<?xml version="1.0"?>
+<robot name="leg" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Import Macros -->
+  <xacro:include filename="$(find centipede_description)/urdf/macros.xacro" />
+
+<!-- legs -->
+<xacro:property name="leg_base_height" value="0.050" />
+<xacro:property name="leg_base_radius" value="0.025" />
+<xacro:property name="leg_base_mass" value="0.5" />
+<xacro:property name="upper_leg_height" value="0.10" />
+<xacro:property name="upper_leg_radius" value="0.02" />
+<xacro:property name="upper_leg_mass" value="2.0" />
+<xacro:property name="lower_leg_height" value="0.1" />
+<xacro:property name="lower_leg_radius" value="0.01" />
+<xacro:property name="lower_leg_mass" value="2.0" />
+<xacro:property name="limit_effort" value="1000" />
+<xacro:property name="limit_velocity" value="100.0" />
+<xacro:property name="limit_lower_1" value="-0.3926875" />
+<xacro:property name="limit_upper_1" value="0.785" />
+<xacro:property name="limit_lower_2" value="-0.1963" />
+<xacro:property name="limit_upper_2" value="0.1963" />
+<xacro:property name="limit_lower_3" value="-0.785" />
+<xacro:property name="limit_upper_3" value="0.785" />
+
+<xacro:property name="sphere_r" value="0.02" />
+<xacro:property name="sphere_mass" value="0.02" />
+
+<xacro:macro name="leg" params="number lr transX transY">
+  <!--number : number of body ; lr: left, right -->
+  <!--1st joint Body-Leg -->
+  <joint type="revolute" name="hinge_${lr}_${number}_1"> 
+    <parent link="body1"/>
+    <child link="base_${lr}_${number}"/>
+    <xacro:if value="${lr == 'left'}">
+      <origin xyz="${transX*0.23} ${transY*bodyRadius} ${bodyHeight}" rpy="0 0 ${PI/2}" />
+    </xacro:if>
+    <xacro:if value="${lr == 'right'}">
+      <origin xyz="${transX*0.23} ${transY*bodyRadius} ${bodyHeight}" rpy="0 0 ${3*PI/2}" />
+    </xacro:if>
+    <axis xyz="0 0 1"/>
+    <limit effort="${limit_effort}" velocity="${limit_velocity}" lower="${limit_lower_1}" upper="${limit_upper_1}" />
+  </joint>
+
+  <!-- Leg base -->
+  <link name="base_${lr}_${number}">
+    <visual>
+      <geometry>
+        <sphere radius="${leg_base_radius}"/>
+      </geometry>
+      <material name="Black" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0 " />
+      <geometry>
+        <sphere radius="${leg_base_radius}"/>
+      </geometry>
+    </collision>
+    <inertial>
+       <origin xyz="0 0 0" />
+        <mass value="${leg_base_mass}" />
+        <xacro:sphere_inertia  m="${leg_base_mass}" r="${leg_base_radius}" />
+      </inertial>
+  </link>
+  
+  <!--2nd joint--> 
+  <joint type="revolute" name="hinge_${lr}_${number}_2">
+    <parent link="base_${lr}_${number}"/>  
+    <child link="link_${lr}_${number}_upper"/>
+    <origin xyz="0 0 0" rpy="0 1.5707 0" />
+    <axis xyz="0 1 0"/>
+    <limit effort="${limit_effort}" velocity="${limit_velocity}" lower="${limit_lower_2}" upper="${limit_upper_2}" />
+  </joint>
+  
+  <!-- Femur -->
+  <link name="link_${lr}_${number}_upper">
+    <inertial>
+      <origin xyz="0 0 ${upper_leg_height/2}"/>
+      <mass value="${upper_leg_mass}" />
+      <xacro:cylinder_inertia  m="${upper_leg_mass}" r="${upper_leg_radius}" h="${upper_leg_height}" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 ${upper_leg_height/2}" rpy="0 0 0" />
+      <geometry>
+	      <cylinder length="${upper_leg_height}" radius="${upper_leg_radius}"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 ${upper_leg_height/2}" rpy="0 0 0" />
+      <geometry>
+	      <cylinder length="${upper_leg_height}" radius="${upper_leg_radius}"/>
+      </geometry>
+    <material name="Gray" />
+   </visual>
+</link>
+  
+  <joint name="serbo_${lr}_${number}_joint" type="fixed">
+    <parent link="link_${lr}_${number}_upper"/>
+    <child  link="serbo_${lr}_${number}"/>
+    <origin xyz="0 0 ${upper_leg_height}" rpy="1.5707 0 0"/>
+  </joint>
+  
+  <link name="serbo_${lr}_${number}">
+    <visual>
+      <geometry>
+        <cylinder length="${leg_base_height}" radius="${leg_base_radius}"/>
+      </geometry>
+      <material name="Black" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0 " />
+      <geometry>
+        <cylinder length="${leg_base_height}" radius="${leg_base_radius}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="${leg_base_mass}" />
+      <xacro:cylinder_inertia  m="${leg_base_mass}" r="${leg_base_radius}" h="${leg_base_height}" />
+    </inertial>
+  </link>
+  
+  <!--3rd joint: Upper-Lower --> 
+  <joint type="revolute" name="hinge_${lr}_${number}_3">
+    <parent link="serbo_${lr}_${number}"/>  
+    <child link="link_${lr}_${number}_lower"/>
+    <origin xyz="0 0 0" rpy="0 1.5707 0" />
+    <axis xyz="1 0 0"/>
+    <limit effort="${limit_effort}" velocity="${limit_velocity}" lower="${limit_lower_3}" upper="${limit_upper_3}" />
+  </joint>
+  
+  <link name="link_${lr}_${number}_lower">
+    <inertial>
+      <origin xyz="0 0 ${lower_leg_height/2}"/>
+      <mass value="${lower_leg_mass}" />
+      <xacro:cylinder_inertia  m="${lower_leg_mass}" r="${lower_leg_radius}" h="${lower_leg_height}" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 ${lower_leg_height/2}" rpy="0 0 0" />
+      <geometry>
+	      <cylinder length="${lower_leg_height}" radius="${lower_leg_radius}"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 ${lower_leg_height/2}" rpy="0 0 0" />
+      <geometry>
+	      <cylinder length="${lower_leg_height}" radius="${lower_leg_radius}"/>
+      </geometry>
+    <material name="Gray" />
+   </visual>
+  </link>
+  
+
+  
+  <link name="ball_${lr}_${number}">
+  <visual>
+    <geometry>
+      <sphere radius="${sphere_r}"/>
+    </geometry>
+  <material name="Black" />
+   </visual>
+   <collision>
+   <origin xyz="0 0 0" rpy="0 0 0 " />
+	<geometry>
+	<sphere radius="${sphere_r}"/>
+	</geometry>
+</collision>
+<inertial>
+     <origin xyz="0 0 0" />
+      <mass value="${sphere_mass}" />
+      <xacro:sphere_inertia  m="${sphere_mass}" r="${sphere_r}" />
+    </inertial>
+  </link>
+  
+  <joint name="ball_${lr}_${number}_joint" type="fixed">
+    <parent link="link_${lr}_${number}_lower"/>
+    <child  link="ball_${lr}_${number}"/>
+    <origin xyz="0 0 ${lower_leg_height}" rpy="0 0 0"/>
+  </joint>
+  
+  <!--joint-->
+
+<!-- =========gazebo reference============ -->
+<gazebo reference="base_${lr}_${number}">
+<selfCollide value="false"/>
+<material>Gazebo/Black</material>
+<turnGravityOff>false</turnGravityOff>
+</gazebo>
+
+<gazebo reference="link_${lr}_${number}_lower">
+<selfCollide value="false"/>
+<mu1 value="10000.0"/>
+<mu2 value="10000.0"/>
+<kp  value="10000000.0" />
+<kd  value="1.0" />
+<fdir1 value="1 0 0"/>
+<material>Gazebo/Gray</material>
+<turnGravityOff>false</turnGravityOff>
+</gazebo>
+
+<gazebo reference="link_${lr}_${number}_upper">
+<selfCollide value="false"/>
+<mu1 value="10000.0"/>
+<mu2 value="10000.0"/>
+<kp  value="10000000.0" />
+<kd  value="1.0" />
+<fdir1 value="1 0 0"/>
+<material>Gazebo/Gray</material>
+<turnGravityOff>false</turnGravityOff>
+</gazebo>
+
+<gazebo reference="ball_${lr}_${number}">
+<selfCollide value="false"/>
+<mu1 value="10000.0"/>
+<mu2 value="10000.0"/>
+<kp  value="10000000.0" />
+<kd  value="1.0" />
+<fdir1 value="1 0 0"/>
+<material>Gazebo/Black</material>
+<turnGravityOff>false</turnGravityOff>
+</gazebo>
+
+<gazebo reference="serbo_${lr}_${number}">
+<selfCollide value="false"/>
+<mu1 value="10000.0"/>
+<mu2 value="10000.0"/>
+<kp  value="10000000.0" />
+<kd  value="1.0" />
+<fdir1 value="1 0 0"/>
+<material>Gazebo/Black</material>
+<turnGravityOff>false</turnGravityOff>
+</gazebo>
+
+<!-- Transmission is important to link the joints and the controller -->
+<transmission name="hinge_${lr}_${number}_1_trans">
+<type>transmission_interface/SimpleTransmission</type>
+<joint name="hinge_${lr}_${number}_1">
+<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+</joint>
+<actuator name="hinge_${lr}_${number}_1_motor">
+<mechanicalReduction>1</mechanicalReduction>
+</actuator>
+</transmission>
+
+<transmission name="hinge_${lr}_${number}_2_trans">
+<type>transmission_interface/SimpleTransmission</type>
+<joint name="hinge_${lr}_${number}_2">
+<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+</joint>
+<actuator name="hinge_${lr}_${number}_2_motor">
+<mechanicalReduction>1</mechanicalReduction>
+</actuator>
+</transmission>
+
+<transmission name="hinge_${lr}_${number}_3_trans">
+<type>transmission_interface/SimpleTransmission</type>
+<joint name="hinge_${lr}_${number}_3">
+<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+</joint>
+<actuator name="hinge_${lr}_${number}_3_motor">
+<mechanicalReduction>1</mechanicalReduction>
+</actuator>
+</transmission>
+
+</xacro:macro>
+</robot>

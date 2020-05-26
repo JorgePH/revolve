@@ -440,13 +440,13 @@ class WorldManager(manage.WorldManager):
 
         sdf_bot = revolve_bot.to_sdf(pose)
 
-        # if self.output_directory:
-        #     robot_file_path = os.path.join(
-        #         self.output_directory,
-        #         'robot_{}.sdf'.format(revolve_bot.id)
-        #     )
-        #     with open(robot_file_path, 'w') as f:
-        #         f.write(sdf_bot)
+        if self.output_directory:
+            robot_file_path = os.path.join(
+                self.output_directory,
+                'robot_{}.sdf'.format(revolve_bot.id)
+            )
+            with open(robot_file_path, 'w') as f:
+                f.write(sdf_bot)
 
         response = await self.insert_model(sdf_bot, life_timeout)
         robot_manager = self._robot_inserted(

@@ -1,0 +1,22 @@
+---
+id: centipede
+body:
+  id          : Core
+  type        : Body
+  params:
+    red: 0.94
+    green: 0.98
+    blue: 0.05
+  children    :
+    0:
+      id          : Core2
+      type        : Body
+      params:
+        red: 0.98
+        green: 0.98
+        blue: 0.98
+      orientation : 90
+    
+
+brain:
+  type: rlpower-splines

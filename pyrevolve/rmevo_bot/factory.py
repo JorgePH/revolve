@@ -58,8 +58,9 @@ class Factory:
 
 
     def parse_visual(self, module, visual_tree):
-        module.SDF_VISUAL = Visual(visual_tree.get('name'))
-        module.SDF_VISUAL.copy_from_tree(visual_tree)
+        if module.SDF_VISUAL is None:
+            module.SDF_VISUAL = Visual(visual_tree.get('name'))
+            module.SDF_VISUAL.copy_from_tree(visual_tree)
 
     def parse_link(self, module, link_tree):
         module.SDF = link_tree
@@ -88,6 +89,7 @@ class Factory:
 
     def parse_model(self, module, model_tree):
         module.TYPE = model_tree.attrib['name']
+
         for child in model_tree:
             if child.tag == 'link':
                 self.parse_link(module, child)

@@ -264,3 +264,7 @@ class Posable(xml.etree.ElementTree.Element):
 
         for item in list(tree):
             self.append(item)
+
+        # Substitute the element pose by the variable in the instance
+        self.remove(self.find('pose'))
+        self.insert(0, self.pose)

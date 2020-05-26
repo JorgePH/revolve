@@ -19,22 +19,25 @@ async def run():
     """
     The main coroutine, which is started below.
     """
-    robot_file_path = "rmevo/test/neural_rmevo.yaml"
+    robot_file_path = "rmevo/test/centipede.yaml"
     #robot_file_path = "rmevo/test/snake.yaml"
 
     module_file_path = 'rmevo/test/module.sdf'
     module_file_dir = 'rmevo/test/modules'
 
     sdf_file_path = 'rmevo/test/robot.sdf'
+    sdf_folder_path = 'rmevo/test'
 
     # Parse command line / file input arguments
     settings = parser.parse_args()
+
+    settings.simulator_cmd = 'gazebo'
 
     # Start Simulator
     if settings.simulator_cmd != 'debug':
         simulator_supervisor = DynamicSimSupervisor(
             world_file=settings.world,
-            simulator_cmd="gazebo",
+            simulator_cmd=settings.simulator_cmd,
             simulator_args=["--verbose"],
             plugins_dir_path=os.path.join('.', 'build', 'lib'),
             models_dir_path=os.path.join('.', 'models'),
@@ -59,14 +62,15 @@ async def run():
     # robot._brain = BrainRLPowerSplines()
 
     # Print robot to sdf file
-    logger.info("Parsing robot to model.")
-    sdf_model = robot.to_sdf()
-    robot_sdf_file = open(sdf_file_path, 'w')
-    robot_sdf_file.write(sdf_model)
-    robot_sdf_file.close()
+    # logger.info("Parsing robot to model.")
+    # sdf_model = robot.to_sdf()
+    # robot_sdf_file = open(sdf_file_path, 'w')
+    # robot_sdf_file.write(sdf_model)
+    # robot_sdf_file.close()
 
     # Connect to the simulator and pause
     connection = await World.create(settings, world_address=('127.0.0.1', settings.port_start))
+    connection.output_directory = sdf_folder_path
     await asyncio.sleep(1)
 
     # Starts the simulation

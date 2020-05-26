@@ -198,66 +198,66 @@ def _module_to_sdf(module, parent_link, parent_slot: BoxSlot, parent_collision, 
         my_collision = collisions_servo[0]
 
     # elif type(module) is FactoryModule:
-    #     child_link = SDF.Link('{}_Leg'.format(slot_chain), self_collide=self_collide)
+    #     child_link = SDF.Link('{}_{}'.format(slot_chain, module.TYPE), self_collide=self_collide)
     #
     #     child_visual, child_collision, imu_core_sensor = module.to_sdf('', child_link)
     #
-    #     module_slot = module.boxslot_frame(Orientation.SOUTH)
+    #     module_slot = module.boxslot(Orientation.SOUTH)
     #     _sdf_attach_module(module_slot, module.orientation,
-    #                        child_visual, child_collision[0],
+    #                        child_visual, child_collision,
     #                        parent_slot, parent_collision)
-    #
-    #     # for joint in joints:
-    #     #     model.append(joint)
-    #     #     if joint.is_motorized():
-    #     #         actuators.append(joint)
-    #     #
-    #     # for link in links:
-    #     #     link.align_center_of_mass()
-    #     #     # link.calculate_inertial()
-    #     #     model.append(link)
-    #
-    #     parent_slot = module.boxslot_frame(Orientation.NORTH)
-    #     module_slot = module.boxslot_servo(Orientation.SOUTH)
-    #     _sdf_attach_module(module_slot, None,
-    #                        visual_servo, collisions_servo[0],
-    #                        parent_slot, collisions_frame[0])
-    #
-    #     joint.set_rotation(visual_servo.get_rotation())
-    #     old_position = joint.get_position()
-    #     joint.set_position(visual_servo.get_position())
-    #     joint.translate(joint.to_parent_direction(old_position))
-    #
-    #     # Add visuals and collisions for Servo Frame block
-    #     parent_link.append(visual_frame)
-    #     for i, collision_frame in enumerate(collisions_frame):
-    #         parent_link.append(collision_frame)
-    #         collisions.append(collision_frame)
-    #         if i != 0:
-    #             old_pos = collision_frame.get_position()
-    #             collision_frame.set_rotation(visual_frame.get_rotation())
-    #             collision_frame.set_position(visual_frame.get_position())
-    #             collision_frame.translate(collision_frame.to_parent_direction(old_pos))
-    #
-    #     # Add visuals and collisions for Servo block
-    #     child_link.append(visual_servo)
-    #     for i, collision_servo in enumerate(collisions_servo):
-    #         child_link.append(collision_servo)
-    #         collisions.append(collision_servo)
-    #         if i != 0:
-    #             old_pos = collision_servo.get_position()
-    #             collision_servo.set_position(collisions_servo[0].get_position())
-    #             collision_servo.set_rotation(collisions_servo[0].get_rotation())
-    #             collision_servo.translate(collision_servo.to_parent_direction(old_pos))
-    #
-    #     # Add joint
-    #     child_link.add_joint(joint)
-    #     links.append(child_link)
-    #     joints.append(joint)
-    #
-    #     # update my_link and my_collision
-    #     my_link = child_link
-    #     my_collision = collisions_servo[0]
+
+        # for joint in joints:
+        #     model.append(joint)
+        #     if joint.is_motorized():
+        #         actuators.append(joint)
+        #
+        # for link in links:
+        #     link.align_center_of_mass()
+        #     # link.calculate_inertial()
+        #     model.append(link)
+
+        # parent_slot = module.boxslot_frame(Orientation.NORTH)
+        # module_slot = module.boxslot_servo(Orientation.SOUTH)
+        # _sdf_attach_module(module_slot, None,
+        #                    visual_servo, collisions_servo[0],
+        #                    parent_slot, collisions_frame[0])
+        #
+        # joint.set_rotation(visual_servo.get_rotation())
+        # old_position = joint.get_position()
+        # joint.set_position(visual_servo.get_position())
+        # joint.translate(joint.to_parent_direction(old_position))
+        #
+        # # Add visuals and collisions for Servo Frame block
+        # parent_link.append(visual_frame)
+        # for i, collision_frame in enumerate(collisions_frame):
+        #     parent_link.append(collision_frame)
+        #     collisions.append(collision_frame)
+        #     if i != 0:
+        #         old_pos = collision_frame.get_position()
+        #         collision_frame.set_rotation(visual_frame.get_rotation())
+        #         collision_frame.set_position(visual_frame.get_position())
+        #         collision_frame.translate(collision_frame.to_parent_direction(old_pos))
+        #
+        # # Add visuals and collisions for Servo block
+        # child_link.append(visual_servo)
+        # for i, collision_servo in enumerate(collisions_servo):
+        #     child_link.append(collision_servo)
+        #     collisions.append(collision_servo)
+        #     if i != 0:
+        #         old_pos = collision_servo.get_position()
+        #         collision_servo.set_position(collisions_servo[0].get_position())
+        #         collision_servo.set_rotation(collisions_servo[0].get_rotation())
+        #         collision_servo.translate(collision_servo.to_parent_direction(old_pos))
+        #
+        # # Add joint
+        # child_link.add_joint(joint)
+        # links.append(child_link)
+        # joints.append(joint)
+        #
+        # # update my_link and my_collision
+        # my_link = child_link
+        # my_collision = collisions_servo[0]
 
     # OTHERS
     else:
@@ -268,6 +268,8 @@ def _module_to_sdf(module, parent_link, parent_slot: BoxSlot, parent_collision, 
                            visual, collision,
                            parent_slot, parent_collision)
 
+        visual.set('name', 'Visual_{}'.format(module.id))
+        collision.set('name', 'Collisions_{}'.format(module.id))
         parent_link.append(visual)
         parent_link.append(collision)
         collisions.append(collision)

@@ -479,7 +479,9 @@ class FactoryModule(RMEvoModule):
             for module_template in factory.modules_list:
                 if module_template.TYPE == yaml_object['type']:
                     new_module = copy.deepcopy(module_template)
-                else:
+                    break
+
+            if new_module.TYPE == None:
                     assert RuntimeError("Module not implemented")
 
             new_module.id = yaml_object['id']

@@ -70,6 +70,9 @@ class Visual(SDF.Posable):
         for item in list(self):
             newone.append(item)
 
+        newone.remove(newone.find('pose'))
+        newone.insert(0, newone.pose)
+
         return newone
 
 
@@ -169,5 +172,8 @@ class Collision(SDF.Posable):
 
         for item in list(self):
             newone.append(item)
+
+        newone.remove(newone.find('pose'))
+        newone.insert(0, newone.pose)
 
         return newone
