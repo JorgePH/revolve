@@ -1,7 +1,7 @@
 import math
 from ..render.render import Render
 from ..render.grid import Grid
-from ..rmevo_module import ActiveHingeModule, BrickModule, TouchSensorModule, BrickSensorModule, CoreModule
+from ..rmevo_module import ActiveHingeModule, BrickModule, TouchSensorModule, BrickSensorModule, CoreModule, FactoryModule
 from ...custom_logging.logger import logger
 
 
@@ -290,7 +290,7 @@ class MeasureBody:
         try:
             if self.absolute_size is None:
                 self.calculate_count()
-                self.absolute_size = self.brick_count + self.hinge_count + 1
+                self.absolute_size = self.brick_count + self.hinge_count + self.factory_module_count + 1
             return self.absolute_size
         except Exception as e:
             logger.exception(f'Exception: {e}. \nFailed measuring absolute size')
@@ -305,6 +305,8 @@ class MeasureBody:
                 self.brick_count = 0
                 self.brick_sensor_count = 0
                 self.touch_sensor_count = 0
+                self.factory_module_count = 0
+
             if module is None:
                 module = self.body
             elif isinstance(module, ActiveHingeModule):
@@ -315,6 +317,8 @@ class MeasureBody:
                 self.brick_sensor_count += 1
             elif isinstance(module, TouchSensorModule):
                 self.touch_sensor_count += 1
+            elif isinstance(module, FactoryModule):
+                self.factory_module_count += 1
 
             if module.has_children():
                 for core_slot, child_module in module.iter_children():

@@ -91,7 +91,7 @@ class Population:
         self.conf.experiment_management.export_phenotype(individual)
         self.conf.experiment_management.export_phenotype_images(os.path.join('data_fullevolution', 'phenotype_images'), individual)
         individual.phenotype.measure_phenotype()
-        individual.phenotype.export_phenotype_measurements(self.conf.experiment_management.data_folder)
+        # individual.phenotype.export_phenotype_measurements(self.conf.experiment_management.data_folder)
 
         return individual
 

@@ -1,7 +1,7 @@
 import cairo
 from .canvas import Canvas
 from .grid import Grid
-from ..rmevo_module import RMEvoModule, CoreModule, BrickModule, ActiveHingeModule, TouchSensorModule, BrickSensorModule
+from ..rmevo_module import RMEvoModule, CoreModule, BrickModule, ActiveHingeModule, TouchSensorModule, BrickSensorModule, FactoryModule
 from ...custom_logging.logger import logger
 
 
@@ -34,6 +34,14 @@ class Render:
             canvas.move_by_slot(slot)
             Canvas.rotating_orientation += module.orientation
             canvas.save_sensor_position()
+        elif isinstance(module, FactoryModule):
+            if module.id == '1':
+                canvas.draw_controller(module.id)
+            else:
+                canvas.move_by_slot(slot)
+                Canvas.rotating_orientation += module.orientation
+                canvas.draw_module(module.id)
+                canvas.draw_connector_to_parent()
 
         if module.has_children():
             # Traverse children of element to draw on canvas

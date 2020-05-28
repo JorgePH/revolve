@@ -2,16 +2,16 @@
 
 from enum import Enum
 from pyrevolve.genotype import Genotype
-from pyrevolve.revolve_bot import RevolveBot
+from pyrevolve.rmevo_bot import RMEvoBot
 from pyrevolve.rmevo_bot.rmevo_module import Orientation
-from pyrevolve.rmevo_bot.rmevo_module import CoreModule
+from pyrevolve.rmevo_bot.rmevo_module import CoreModule, FactoryModule
 from pyrevolve.rmevo_bot.rmevo_module import ActiveHingeModule
 from pyrevolve.rmevo_bot.rmevo_module import BrickModule
 from pyrevolve.rmevo_bot.rmevo_module import TouchSensorModule
-from pyrevolve.revolve_bot.brain.brain_nn import BrainNN
-from pyrevolve.revolve_bot.brain.brain_nn import Node
-from pyrevolve.revolve_bot.brain.brain_nn import Connection
-from pyrevolve.revolve_bot.brain.brain_nn import Params
+from pyrevolve.rmevo_bot.brain.brain_nn import BrainNN
+from pyrevolve.rmevo_bot.brain.brain_nn import Node
+from pyrevolve.rmevo_bot.brain.brain_nn import Connection
+from pyrevolve.rmevo_bot.brain.brain_nn import Params
 from ...custom_logging.logger import logger
 import random
 import math
@@ -183,12 +183,16 @@ class Plasticoding(Genotype):
             self.valid = True
 
     def develop(self):
-        self.early_development()
-        phenotype = self.late_development()
+        if self.conf.factory is not None:
+            self.rmevo_early_development()
+            phenotype = self.rmevo_late_development()
+        else:
+            self.early_development()
+            phenotype = self.late_development()
+
         return phenotype
 
     def early_development(self):
-
         self.intermediate_phenotype = [[self.conf.axiom_w, []]]
 
         for i in range(0, self.conf.i_iterations):
@@ -211,7 +215,7 @@ class Plasticoding(Genotype):
 
     def late_development(self):
 
-        self.phenotype = RevolveBot()
+        self.phenotype = RMEvoBot()
         self.phenotype._id = self.id if type(self.id) == str and self.id.startswith("robot") else "robot_{}".format(self.id)
         self.phenotype._brain = BrainNN()
 
@@ -253,6 +257,82 @@ class Plasticoding(Genotype):
 
             if [symbol[self.index_symbol], []] in Alphabet.controller_moving_commands():
                 self.decode_brain_moving(symbol)
+
+        self.add_imu_nodes()
+        logger.info('Robot ' + str(self.id) + ' was late-developed.')
+
+        return self.phenotype
+
+    def rmevo_early_development(self):
+        from ...rmevo_bot.factory import Alphabet
+
+        self.intermediate_phenotype = [[self.conf.axiom_w, []]]
+
+        for i in range(0, self.conf.i_iterations):
+
+            position = 0
+            for aux_index in range(0, len(self.intermediate_phenotype)):
+
+                symbol = self.intermediate_phenotype[position]
+                if [symbol[self.index_symbol], []] in Alphabet.modules(self.conf.factory):
+                    # removes symbol
+                    self.intermediate_phenotype.pop(position)
+                    # replaces by its production rule
+                    for ii in range(0, len(self.grammar[symbol[self.index_symbol]])):
+                        self.intermediate_phenotype.insert(position+ii,
+                                                           self.grammar[symbol[self.index_symbol]][ii])
+                    position = position+ii+1
+                else:
+                    position = position + 1
+        # logger.info('Robot ' + str(self.id) + ' was early-developed.')
+
+    def rmevo_late_development(self):
+        from ...rmevo_bot.factory import Alphabet
+
+        self.phenotype = RMEvoBot()
+        self.phenotype._id = self.id if type(self.id) == str and self.id.startswith("robot") else "robot_{}".format(self.id)
+        self.phenotype._brain = BrainNN()
+
+        for symbol in self.intermediate_phenotype:
+
+            if symbol[self.index_symbol] == self.conf.axiom_w:
+                module = FactoryModule()
+                for module_template in self.conf.factory.modules_list:
+                    if module_template.TYPE == symbol[self.index_symbol]:
+                        module = copy.deepcopy(module_template)
+                        break
+
+                self.phenotype._body = module
+
+                module.id = str(self.quantity_modules)
+                module.info = {'orientation': Orientation.NORTH,
+                               'new_module_type': 'Core'}
+                module.orientation = 0
+                module.rgb = [1, 1, 0]
+                self.mounting_reference = module
+
+            if [symbol[self.index_symbol], []] in Alphabet.morphology_mounting_commands():
+                self.morph_mounting_container = symbol[self.index_symbol]
+
+            if [symbol[self.index_symbol], []] in Alphabet.modules(self.conf.factory) \
+                    and symbol[self.index_symbol] is not self.conf.axiom_w \
+                    and self.morph_mounting_container is not None:
+
+                slot = self.get_slot(self.morph_mounting_container).value
+
+                if self.quantity_modules < self.conf.max_structural_modules:
+                    self.new_module(slot,
+                                    symbol[self.index_symbol],
+                                    symbol)
+
+            if [symbol[self.index_symbol], []] in Alphabet.morphology_moving_commands():
+                self.move_in_body(symbol)
+
+            # if [symbol[self.index_symbol], []] in Alphabet.controller_changing_commands():
+            #     self.decode_brain_changing(symbol)
+            #
+            # if [symbol[self.index_symbol], []] in Alphabet.controller_moving_commands():
+            #     self.decode_brain_moving(symbol)
 
         self.add_imu_nodes()
         logger.info('Robot ' + str(self.id) + ' was late-developed.')
@@ -401,22 +481,23 @@ class Plasticoding(Genotype):
         rgb = []
         if new_module_type == Alphabet.BLOCK:
             rgb = [0, 0, 1]
-        if new_module_type == Alphabet.JOINT_HORIZONTAL:
+        elif new_module_type == Alphabet.JOINT_HORIZONTAL:
             rgb = [1, 0.08, 0.58]
-        if new_module_type == Alphabet.JOINT_VERTICAL:
+        elif new_module_type == Alphabet.JOINT_VERTICAL:
             rgb = [0.7, 0, 0]
-        if new_module_type == Alphabet.SENSOR:
+        elif new_module_type == Alphabet.SENSOR:
             rgb = [0.7, 0.7, 0.7]
+
         return rgb
 
     def get_slot(self, morph_mounting_container):
-
+        from ...rmevo_bot.factory import Alphabet as RMEvoAlphabet
         slot = None
-        if morph_mounting_container == Alphabet.ADD_FRONT:
+        if morph_mounting_container == Alphabet.ADD_FRONT or morph_mounting_container == RMEvoAlphabet.ADD_FRONT:
             slot = Orientation.NORTH
-        if morph_mounting_container == Alphabet.ADD_LEFT:
+        if morph_mounting_container == Alphabet.ADD_LEFT or morph_mounting_container == RMEvoAlphabet.ADD_LEFT:
             slot = Orientation.WEST
-        if morph_mounting_container == Alphabet.ADD_RIGHT:
+        if morph_mounting_container == Alphabet.ADD_RIGHT or morph_mounting_container == RMEvoAlphabet.ADD_RIGHT:
             slot = Orientation.EAST
         return slot
 
@@ -493,11 +574,17 @@ class Plasticoding(Genotype):
         if mount:
             if new_module_type == Alphabet.BLOCK:
                 module = BrickModule()
-            if new_module_type == Alphabet.JOINT_VERTICAL \
+            elif new_module_type == Alphabet.JOINT_VERTICAL \
                     or new_module_type == Alphabet.JOINT_HORIZONTAL:
                 module = ActiveHingeModule()
-            if new_module_type == Alphabet.SENSOR:
+            elif new_module_type == Alphabet.SENSOR:
                 module = TouchSensorModule()
+            else:
+                module = FactoryModule()
+                for module_template in self.conf.factory.modules_list:
+                    if module_template.TYPE == new_module_type:
+                        module = copy.deepcopy(module_template)
+                        break
 
             module.info = {}
             module.info['new_module_type'] = new_module_type
@@ -505,21 +592,26 @@ class Plasticoding(Genotype):
                                                 self.mounting_reference)
             module.rgb = self.get_color(new_module_type)
 
+            if not module.rgb:
+                if module.SDF_VISUAL.find('material') is not None and \
+                        module.SDF_VISUAL.find('material').find('ambient') is not None:
+                    module.rgb = module.SDF_VISUAL.find('material').find('ambient').text
+                else:
+                    module.rgb = [0, 0, 0]
+
             if new_module_type != Alphabet.SENSOR:
                 self.quantity_modules += 1
                 module.id = str(self.quantity_modules)
-                intersection = self.check_intersection(self.mounting_reference, slot, module)
+                # intersection = self.check_intersection(self.mounting_reference, slot, module)
+                #
+                # if not intersection:
 
-                if not intersection:
-                    self.mounting_reference.children[slot] = module
-                    self.morph_mounting_container = None
-                    self.mounting_reference_stack.append(self.mounting_reference)
-                    self.mounting_reference = module
-                    if new_module_type == Alphabet.JOINT_HORIZONTAL \
-                            or new_module_type == Alphabet.JOINT_VERTICAL:
-                        self.decode_brain_node(symbol, module.id)
-                else:
-                    self.quantity_modules -= 1
+                self.mounting_reference.children[slot] = module
+                self.morph_mounting_container = None
+                self.mounting_reference_stack.append(self.mounting_reference)
+                self.mounting_reference = module
+                # else:
+                #     self.quantity_modules -= 1
             else:
                 self.mounting_reference.children[slot] = module
                 self.morph_mounting_container = None
@@ -686,7 +778,8 @@ class PlasticodingConfig:
                  axiom_w=Alphabet.CORE_COMPONENT,
                  i_iterations=3,
                  max_structural_modules=100,
-                 robot_id=0
+                 robot_id=0,
+                 factory=None
                  ):
         self.initialization_genome = initialization_genome
         self.e_max_groups = e_max_groups
@@ -700,3 +793,4 @@ class PlasticodingConfig:
         self.i_iterations = i_iterations
         self.max_structural_modules = max_structural_modules
         self.robot_id = robot_id
+        self.factory = factory
