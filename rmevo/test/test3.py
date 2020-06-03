@@ -14,10 +14,11 @@ from pyrevolve.evolution.population import Population, PopulationConfig
 from pyrevolve.evolution.pop_management.steady_state import steady_state_population_management
 from pyrevolve.experiment_management import ExperimentManagement
 from pyrevolve.genotype.plasticoding.crossover.crossover import CrossoverConfig
-from pyrevolve.genotype.plasticoding.crossover.standard_crossover import standard_crossover
+from pyrevolve.genotype.plasticoding.crossover import rmevo_crossovers
+from pyrevolve.genotype.plasticoding.initialization import random_initialization
 from pyrevolve.genotype.plasticoding.initialization import rmevo_random_initialization
 from pyrevolve.genotype.plasticoding.mutation.mutation import MutationConfig
-from pyrevolve.genotype.plasticoding.mutation.standard_mutation import standard_mutation
+from pyrevolve.genotype.plasticoding.mutation.rmevo_mutations import standard_mutation
 from pyrevolve.genotype.plasticoding.plasticoding import PlasticodingConfig
 from pyrevolve.util.supervisor.analyzer_queue import AnalyzerQueue
 from pyrevolve.util.supervisor.simulator_queue import SimulatorQueue
@@ -39,28 +40,29 @@ async def run():
 
     # experiment params #
     num_generations = 1
-    population_size = 5
-    offspring_size = 5
+    population_size = 30
+    offspring_size = 1
 
     genotype_conf = PlasticodingConfig(
-        max_structural_modules=2,
+        max_structural_modules=5,
         factory=factory,
         axiom_w='Body',
     )
 
     mutation_conf = MutationConfig(
-        mutation_prob=0.8,
+        mutation_prob=1,
         genotype_conf=genotype_conf,
     )
 
     crossover_conf = CrossoverConfig(
-        crossover_prob=0.8,
+        crossover_prob=0,
     )
     # experiment params #
 
     # Parse command line / file input arguments
     settings = parser.parse_args()
     settings.recovery_enabled = False
+    settings.evaluation_time = 1
 
     experiment_management = ExperimentManagement(settings)
     do_recovery = settings.recovery_enabled and not experiment_management.experiment_is_new()
@@ -80,11 +82,13 @@ async def run():
     population_conf = PopulationConfig(
         population_size=population_size,
         genotype_constructor=rmevo_random_initialization,
+        #genotype_constructor=random_initialization,
         genotype_conf=genotype_conf,
-        fitness_function=fitness.displacement_velocity,
+        fitness_function=fitness.maximum_weight,
         mutation_operator=standard_mutation,
         mutation_conf=mutation_conf,
-        crossover_operator=standard_crossover,
+        #crossover_operator=rmevo_crossovers.standard_crossover,
+        crossover_operator=None,
         crossover_conf=crossover_conf,
         selection=lambda individuals: tournament_selection(individuals, 2),
         parent_selection=lambda individuals: multiple_selection(individuals, 2, tournament_selection),
@@ -98,6 +102,7 @@ async def run():
 
     n_cores = settings.n_cores
 
+    settings.output_directory = 'file'
     settings.simulator_cmd = 'gazebo'
     settings.world = 'worlds/plane.realtime.world'
     simulator_queue = SimulatorQueue(n_cores, settings, settings.port_start)

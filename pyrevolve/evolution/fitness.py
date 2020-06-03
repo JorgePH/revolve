@@ -81,3 +81,9 @@ def floor_is_lava(robot_manager, robot):
         fitness = _displacement_velocity_hill * _contacts
 
     return fitness
+
+
+def maximum_weight(robot_manager, robot):
+    fitness = robot_manager.robot._morphological_measurements.width
+
+    return fitness

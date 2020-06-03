@@ -304,6 +304,7 @@ class Plasticoding(Genotype):
 
                 self.phenotype._body = module
 
+                self.quantity_modules = 1
                 module.id = str(self.quantity_modules)
                 module.info = {'orientation': Orientation.NORTH,
                                'new_module_type': 'Core'}

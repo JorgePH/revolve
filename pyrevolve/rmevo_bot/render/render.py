@@ -61,7 +61,9 @@ class Render:
         @param slot: attachment of parent slot
         @param include_sensors: add sensors to visisted_cooridnates if True
         """
-        if isinstance(module, ActiveHingeModule) or isinstance(module, BrickModule) or isinstance(module, TouchSensorModule) or isinstance(module, BrickSensorModule):
+        if isinstance(module, ActiveHingeModule) or isinstance(module, BrickModule) or \
+                isinstance(module, TouchSensorModule) or isinstance(module, BrickSensorModule) \
+                or isinstance(module, FactoryModule):
             self.grid.move_by_slot(slot)
             self.grid.add_to_visited(include_sensors, isinstance(module, TouchSensorModule))
         if module.has_children():

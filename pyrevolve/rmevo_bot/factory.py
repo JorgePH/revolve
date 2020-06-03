@@ -132,3 +132,51 @@ class Factory:
                 if fnmatch.fnmatch(file_path, '*.sdf'):
                     self.import_module_from_sdf(file_path)
 
+class Alphabet(Enum):
+    # MorphologyMountingCommands
+    ADD_RIGHT = 'addr'
+    ADD_FRONT = 'addf'
+    ADD_LEFT = 'addl'
+
+    # MorphologyMovingCommands
+    MOVE_RIGHT = 'mover'
+    MOVE_FRONT = 'movef'
+    MOVE_LEFT = 'movel'
+    MOVE_BACK = 'moveb'
+
+    # ControllerChangingCommands
+    ADD_EDGE = 'brainedge'
+    MUTATE_EDGE = 'brainperturb'
+    LOOP = 'brainloop'
+    MUTATE_AMP = 'brainampperturb'
+    MUTATE_PER = 'brainperperturb'
+    MUTATE_OFF = 'brainoffperturb'
+
+    # ControllerMovingCommands
+    MOVE_REF_S = 'brainmoveFTS'
+    MOVE_REF_O = 'brainmoveTTS'
+
+    @staticmethod
+    def modules(factory):
+        modules = []
+        for module in factory.modules_list:
+            modules.append([module.TYPE, []])
+
+        return modules
+
+    @staticmethod
+    def morphology_mounting_commands():
+        return [
+            [Alphabet.ADD_RIGHT, []],
+            [Alphabet.ADD_FRONT, []],
+            [Alphabet.ADD_LEFT, []]
+        ]
+
+    @staticmethod
+    def morphology_moving_commands():
+        return [
+            [Alphabet.MOVE_RIGHT, []],
+            [Alphabet.MOVE_FRONT, []],
+            [Alphabet.MOVE_LEFT, []],
+            [Alphabet.MOVE_BACK, []]
+        ]

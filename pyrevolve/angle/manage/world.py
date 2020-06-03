@@ -439,11 +439,11 @@ class WorldManager(manage.WorldManager):
         assert(not str(revolve_bot.id).isdigit())
 
         sdf_bot = revolve_bot.to_sdf(pose)
-
+        self.output_directory = './rmevo/test/data/default_experiment/1/data_fullevolution'
         if self.output_directory:
             robot_file_path = os.path.join(
                 self.output_directory,
-                'robot_{}.sdf'.format(revolve_bot.id)
+                '{}.sdf'.format(revolve_bot.id)
             )
             with open(robot_file_path, 'w') as f:
                 f.write(sdf_bot)

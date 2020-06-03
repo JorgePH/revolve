@@ -40,7 +40,7 @@ def _generate_random_grammar(conf):
                 Plasticoding.build_symbol(
                     Alphabet.morphology_mounting_commands()[symbol_mounting], conf),
                 Plasticoding.build_symbol(
-                    Alphabet.modules(conf.factory)[symbol_module], conf),
+                    Alphabet.modules()[symbol_module], conf),
                 Plasticoding.build_symbol(
                     Alphabet.morphology_moving_commands()[symbol_morph_moving], conf),
             ])
