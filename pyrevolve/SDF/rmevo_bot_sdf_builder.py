@@ -57,18 +57,8 @@ def rmevo_bot_to_sdf(robot, robot_pose, nice_format, self_collide=True):
         if joint.is_motorized():
             actuators.append(joint)
 
-    print('Starting link...')
     for link in links:
-        print(links[0].findall('visual')[0].find('pose').text)
-        print(links[0].findall('collision')[0].find('pose').text)
-        print(links[0].findall('visual')[1].find('pose').text)
-        print(links[0].findall('collision')[1].find('pose').text)
         link.align_center_of_mass()
-        print('Aligned')
-        print(links[0].findall('visual')[0].find('pose').text)
-        print(links[0].findall('collision')[0].find('pose').text)
-        print(links[0].findall('visual')[1].find('pose').text)
-        print(links[0].findall('collision')[1].find('pose').text)
         #link.calculate_inertial()
         model.append(link)
 
@@ -119,9 +109,6 @@ def _sdf_attach_module(module_slot, module_orientation: float,
         rot = SDF.math.Quaternion.from_angle_axis(orientation, module_slot.normal)
         module_slot.tangent = rot * module_slot.tangent
 
-    print(visual.find('pose').text)
-    print(collision.find('pose').text)
-
     visual.align(
         module_slot,
         parent_slot,
@@ -132,9 +119,6 @@ def _sdf_attach_module(module_slot, module_orientation: float,
     old_translation = collision.get_position()
     collision.set_position(visual.get_position())
     #collision.translate(collision.to_parent_direction(old_translation))
-
-    print(visual.find('pose').text)
-    print(collision.find('pose').text)
 
 
 def _module_to_sdf(module, parent_link, parent_slot: BoxSlot, parent_collision, slot_chain, self_collide):
@@ -278,15 +262,11 @@ def _module_to_sdf(module, parent_link, parent_slot: BoxSlot, parent_collision, 
     # OTHERS
     else:
         visual, collision, sensor = module.to_sdf(slot_chain, my_link)
-        print(visual.find('pose').text)
-        print(collision.find('pose').text)
 
         module_slot = module.boxslot(Orientation.SOUTH)
         _sdf_attach_module(module_slot, module.orientation,
                            visual, collision,
                            parent_slot, parent_collision)
-        print(visual.find('pose').text)
-        print(collision.find('pose').text)
 
         visual.set('name', 'Visual_{}'.format(module.id))
         collision.set('name', 'Collisions_{}'.format(module.id))
