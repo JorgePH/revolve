@@ -99,7 +99,7 @@ class Factory:
             module.SLOT_DATA = []
             module.children = []
             for child in slots_tag:
-                new_slot = BoxSlot([[0, 0], [0, 0], [0, 0]], orientation=Orientation.NORTH)
+                new_slot = BoxSlot([[0, 0], [1, 0], [0, 0]], orientation=Orientation.SOUTH)
                 new_slot.pos = SDF.math.Vector3(self.parse_sdf_text(child.find('pos')))
                 new_slot.normal = SDF.math.Vector3(self.parse_sdf_text(child.find('norm')))
                 new_slot.tangent = SDF.math.Vector3(self.parse_sdf_text(child.find('tan')))

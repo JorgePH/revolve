@@ -44,18 +44,18 @@ async def run():
     offspring_size = 5
 
     genotype_conf = PlasticodingConfig(
-        max_structural_modules=5,
+        max_structural_modules=10,
         factory=factory,
-        axiom_w='Body',
+        axiom_w='Core',
     )
 
     mutation_conf = MutationConfig(
-        mutation_prob=1,
+        mutation_prob=0.8,
         genotype_conf=genotype_conf,
     )
 
     crossover_conf = CrossoverConfig(
-        crossover_prob=0,
+        crossover_prob=0.8,
     )
     # experiment params #
 
