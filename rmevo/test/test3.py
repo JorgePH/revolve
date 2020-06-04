@@ -39,9 +39,9 @@ async def run():
     factory.import_modules_from_dir(module_file_dir)
 
     # experiment params #
-    num_generations = 1
-    population_size = 30
-    offspring_size = 1
+    num_generations = 5
+    population_size = 10
+    offspring_size = 5
 
     genotype_conf = PlasticodingConfig(
         max_structural_modules=5,

@@ -1,5 +1,7 @@
 from xml.etree.ElementTree import ElementTree
 from .rmevo_module import FactoryModule
+
+from .. import SDF
 from enum import Enum
 
 import copy
@@ -47,6 +49,15 @@ class Factory:
 
         return value
 
+    def parse_sdf_text(self, tag):
+        value = tag.text
+
+        if value is not None:
+            value = value.split()
+            value = [float(i) for i in value]
+
+        return value
+
     def parse_inertia(self, module, inertia_tree):
         module.SDF_INERTIA = inertia_tree
         module.MASS = float(inertia_tree.find('mass').text)
@@ -81,11 +92,21 @@ class Factory:
             raise RuntimeError('Visual tag not found in link')
 
     def parse_rmevo(self, module, rmevo_tree):
-        for child in rmevo_tree:
-            if child.tag == 'slots':
-                module.SLOT_COORDINATES[0] = self.parse_sdf_attribute(child, 'x')
-                module.SLOT_COORDINATES[1] = self.parse_sdf_attribute(child, 'y')
-                module.SLOT_COORDINATES[2] = self.parse_sdf_attribute(child, 'z')
+        from .rmevo_module import BoxSlot, Orientation
+
+        slots_tag = rmevo_tree.find('slots')
+        if slots_tag is not None:
+            module.SLOT_DATA = []
+            module.children = []
+            for child in slots_tag:
+                new_slot = BoxSlot([[0, 0], [0, 0], [0, 0]], orientation=Orientation.NORTH)
+                new_slot.pos = SDF.math.Vector3(self.parse_sdf_text(child.find('pos')))
+                new_slot.normal = SDF.math.Vector3(self.parse_sdf_text(child.find('norm')))
+                new_slot.tangent = SDF.math.Vector3(self.parse_sdf_text(child.find('tan')))
+                module.SLOT_DATA.append(new_slot)
+                module.children.append(None)
+        else:
+            assert AttributeError("Tag free_slots not found in module %s, using default", module.TYPE)
 
     def parse_model(self, module, model_tree):
         module.TYPE = model_tree.attrib['name']

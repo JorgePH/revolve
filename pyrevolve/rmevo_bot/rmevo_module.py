@@ -27,6 +27,8 @@ class Orientation(Enum):
     NORTH = 1
     EAST = 2
     WEST = 3
+    UP = 4
+    DOWN = 5
 
     def short_repr(self):
         if self == self.SOUTH:
@@ -37,6 +39,10 @@ class Orientation(Enum):
             return 'E'
         elif self == self.WEST:
             return 'W'
+        elif self == self.UP:
+            return 'U'
+        elif self == self.DOWN:
+            return 'D'
         else:
             assert False
 
@@ -442,18 +448,17 @@ class FactoryModule(RMEvoModule):
     """
     TYPE = None
     VISUAL_MESH = None
-    SLOT_COORDINATES = [[0, 0],
-                        [0, 0],
-                        [0, 0]]
     COLLISION_BOX = None
     MASS = None
     SDF = None
     SDF_VISUAL = None
     SDF_COLLISION = None
     SDF_INERTIA = None
+    SLOT_DATA = None
 
     def __init__(self):
         super().__init__()
+        self.SLOT_DATA = []
 
     def possible_slots(self):
         return self.SLOT_COORDINATES
@@ -554,6 +559,10 @@ class BoxSlot:
             return SDF.math.Vector3(boundaries[0][1], 0, 0)
         elif slot == Orientation.WEST:
             return SDF.math.Vector3(boundaries[0][0], 0, 0)
+        elif slot == Orientation.UP:
+            return SDF.math.Vector3(0, 0, boundaries[2][0])
+        elif slot == Orientation.DOWN:
+            return SDF.math.Vector3(0, 0, boundaries[2][1])
         else:
             raise RuntimeError('invalid module orientation: {}'.format(slot))
 
@@ -570,6 +579,10 @@ class BoxSlot:
             return SDF.math.Vector3(0, 0, 1)
         elif slot == Orientation.WEST:
             return SDF.math.Vector3(0, 0, 1)
+        elif slot == Orientation.UP:
+            return SDF.math.Vector3(0, 1, 0)
+        elif slot == Orientation.DOWN:
+            return SDF.math.Vector3(0, 1, 0)
         # elif slot == 4:
         #     # Right face tangent: back face
         #     return SDF.math.Vector3(0, 1, 0)

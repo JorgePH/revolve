@@ -81,6 +81,7 @@ def _generate_rmevo_random_grammar(conf):
             grammar[symbol[0]] = []
 
         for s in range(0, s_segments):
+            #TODO Change mounting commands selection to uniform probability
             symbol_module = random.randint(
                 1, len(Alphabet.modules(conf.factory)) - 1)
             symbol_mounting = random.randint(

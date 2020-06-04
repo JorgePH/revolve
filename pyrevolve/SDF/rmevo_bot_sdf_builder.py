@@ -34,8 +34,12 @@ def rmevo_bot_to_sdf(robot, robot_pose, nice_format, self_collide=True):
     for core_slot, child_module in robot._body.iter_children():
         if child_module is None:
             continue
-        core_slot = robot._body.boxslot(Orientation(core_slot))
-        slot_chain = core_slot.orientation.short_repr()
+        if type(robot.body) == FactoryModule:
+            core_slot = robot.body.SLOT_DATA[core_slot]
+            slot_chain = robot.body.TYPE
+        else:
+            core_slot = robot._body.boxslot(Orientation(core_slot))
+            slot_chain = core_slot.orientation.short_repr()
 
         children_links, \
         children_joints, \
@@ -197,7 +201,53 @@ def _module_to_sdf(module, parent_link, parent_slot: BoxSlot, parent_collision, 
         my_link = child_link
         my_collision = collisions_servo[0]
 
-    # elif type(module) is FactoryModule:
+    elif type(module) is FactoryModule:
+        visual, collision, sensor = module.to_sdf(slot_chain, my_link)
+
+        module_slot = module.SLOT_DATA[0]
+
+        _sdf_attach_module(module_slot, module.orientation,
+                           visual, collision,
+                           parent_slot, parent_collision)
+
+        visual.set('name', 'Visual_{}'.format(module.id))
+        collision.set('name', 'Collisions_{}'.format(module.id))
+        parent_link.append(visual)
+        parent_link.append(collision)
+        collisions.append(collision)
+
+        my_collision = collision
+
+        if sensor is not None:
+            sensors.append(sensor)
+
+        # RECURSION ON CHILDREN
+        for my_slot, child_module in module.iter_children():
+            if child_module is None:
+                continue
+
+            if type(module) is FactoryModule:
+                child_slot_chain = '{}{}'.format(slot_chain, my_slot)
+                my_slot = module.SLOT_DATA[my_slot]
+            else:
+                my_slot = module.boxslot(Orientation(my_slot))
+                child_slot_chain = '{}{}'.format(slot_chain, my_slot.orientation.short_repr())
+
+            children_links, \
+            children_joints, \
+            children_sensors, \
+            children_collisions = _module_to_sdf(child_module,
+                                                 my_link,
+                                                 my_slot,
+                                                 my_collision,
+                                                 child_slot_chain, self_collide)
+            links.extend(children_links)
+            joints.extend(children_joints)
+            sensors.extend(children_sensors)
+            collisions.extend(children_collisions)
+
+        return links, joints, sensors, collisions
+
     #     child_link = SDF.Link('{}_{}'.format(slot_chain, module.TYPE), self_collide=self_collide)
     #
     #     child_visual, child_collision, imu_core_sensor = module.to_sdf('', child_link)

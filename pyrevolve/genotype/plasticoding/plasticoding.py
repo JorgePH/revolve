@@ -292,6 +292,7 @@ class Plasticoding(Genotype):
         self.phenotype = RMEvoBot()
         self.phenotype._id = self.id if type(self.id) == str and self.id.startswith("robot") else "robot_{}".format(self.id)
         self.phenotype._brain = BrainNN()
+        self.phenotype.factory = self.conf.factory
 
         for symbol in self.intermediate_phenotype:
 
@@ -557,6 +558,8 @@ class Plasticoding(Genotype):
             return False
 
     def new_module(self, slot, new_module_type, symbol):
+        while slot > len(self.mounting_reference.children) - 1:
+            slot = slot - 1
 
         mount = False
         if self.mounting_reference.children[slot] is None \
