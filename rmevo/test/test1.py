@@ -26,7 +26,7 @@ async def run():
     #robot_file_path = "rmevo/test/twomodules.yaml"
     robot_file_path = "rmevo/test/basic_revolve.yaml"
     #robot_file_path = "experiments/examples/yaml/spider.yaml"
-    module_file_path = 'rmevo/test/module.sdf'
+    module_file_path = 'rmevo/test/modules/basic/module.sdf'
     sdf_file_path = 'rmevo/test/robot.sdf'
 
     # Parse command line / file input arguments
